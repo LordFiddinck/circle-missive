@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/test-setup.ts","./src/vite-env.d.ts","./src/lib/supabaseClient.ts","./src/lib/useSession.ts","./src/routes/Dashboard.tsx","./src/routes/ProtectedRoute.tsx","./src/routes/SignIn.test.tsx","./src/routes/SignIn.tsx"],"errors":true,"version":"5.9.3"}

@@ -1,0 +1,65 @@
+name: deploy-pages
+
+# Runs only after the "check" workflow completes successfully on
+# main, matching README.md's "deploy-pages.yml builds and publishes
+# dist/ to GitHub Pages on every push to main, after check.yml
+# passes." (a workflow_run trigger, rather than duplicating check.yml's
+# steps here, is what actually enforces that ordering).
+on:
+  workflow_run:
+    workflows: [check]
+    branches: [main]
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; don't cancel one that's already
+# publishing partway through in favor of a newer push.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # See README.md's "Deployment" section for exactly which secrets/
+      # variables to set, and why the service-role/Resend/Groq keys
+      # must never be added here.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

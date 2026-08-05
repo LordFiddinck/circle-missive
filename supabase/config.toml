@@ -1,0 +1,41 @@
+project_id = "circle-missive"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+# Magic-link sign-in only for the MVP (Section 7 of the implementation plan).
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+# The four Phase 4 functions are never called with a Supabase user JWT
+# (Supabase Cron and Resend's webhook don't have one to send), so the
+# platform's built-in JWT check is disabled for each — see the shared-
+# secret check in supabase/functions/_shared/cronAuth.ts and the
+# signature verification in supabase/functions/resend-webhook/index.ts
+# for what actually authorizes these instead.
+[functions.scheduler-tick]
+verify_jwt = false
+
+[functions.email-worker]
+verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
+
+[functions.health]
+verify_jwt = false

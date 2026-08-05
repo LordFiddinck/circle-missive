@@ -1,0 +1,6 @@
+dist
+node_modules
+
+# Deno (Supabase Edge Functions) — a separate runtime with its own
+# formatter (`deno fmt`); see supabase/functions/README.md.
+supabase/functions

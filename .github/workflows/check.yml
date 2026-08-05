@@ -1,0 +1,108 @@
+name: check
+
+# Referenced throughout this repo (README.md's deployment section,
+# supabase/tests/database/000_stub_auth.sql's header comment) as the
+# gate before deploy-pages.yml runs, and as what runs "format check,
+# lint, typecheck, unit tests, pgTAP database tests, build" on every
+# change — see README.md's "What's implemented so far".
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  frontend:
+    name: Format, lint, typecheck, unit tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+      # The build only needs syntactically valid-looking Supabase
+      # config to compile — it never contacts a real project. Real
+      # values are only needed for deploy-pages.yml, which actually
+      # ships the build.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+
+  database:
+    name: pgTAP database tests
+    runs-on: ubuntu-latest
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: circle_missive_test
+    steps:
+      - uses: actions/checkout@v4
+
+      # ubuntu-latest ships a postgresql-client but not a server, and
+      # its default apt repos don't carry a pgtap package for every
+      # supported PG version — add the PGDG repo so `postgresql-16`
+      # and `postgresql-16-pgtap` both resolve reliably.
+      - name: Install PostgreSQL 16 and pgTAP
+        run: |
+          sudo apt-get purge -y '^postgres.*' || true
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          sudo sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo apt-get update
+          sudo apt-get install -y postgresql-16 postgresql-16-pgtap
+          sudo systemctl start postgresql
+          sudo -u postgres psql -c "alter user postgres password 'postgres';"
+          sudo -u postgres createdb circle_missive_test
+
+      # Order matters and mirrors 000_stub_auth.sql's own header
+      # comment: on a real Supabase project (or `supabase test db`
+      # against the local stack) the `auth` schema/roles already
+      # exist before any migration runs; here, on plain Postgres, we
+      # have to create that stub *first* since 0001_init_profiles.sql
+      # references auth.users immediately. 001_helpers.sql and
+      # 002_test_grants.sql run after the schema they depend on
+      # exists, same as they would locally.
+      - name: Apply auth stub, then migrations
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/database/000_stub_auth.sql
+          for f in supabase/migrations/*.sql; do
+            echo "applying $f"
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/database/001_helpers.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/database/002_test_grants.sql
+
+      # pg_prove would need its own Perl/TAP::Parser install; since
+      # every suite already wraps itself in begin/rollback and ends
+      # with `select * from finish();` (see any *.test.sql file), a
+      # plain `not ok` grep on psql's own output is enough to fail the
+      # job without that extra dependency.
+      - name: Run pgTAP suites
+        run: |
+          set -euo pipefail
+          status=0
+          for f in supabase/tests/database/*.test.sql; do
+            echo "=== $f ==="
+            if ! psql -v ON_ERROR_STOP=1 -f "$f" | tee /tmp/pgtap-output.txt; then
+              status=1
+            fi
+            if grep -q '^not ok' /tmp/pgtap-output.txt; then
+              echo "::error file=$f::pgTAP reported at least one failing assertion"
+              status=1
+            fi
+          done
+          exit "$status"

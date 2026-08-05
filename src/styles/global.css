@@ -1,0 +1,68 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 40rem;
+  padding: 2rem 1rem;
+}
+
+:focus-visible {
+  outline: 3px solid Highlight;
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font: inherit;
+  display: block;
+  width: 100%;
+  margin: 0.25rem 0 1rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Visually hidden but still announced by screen readers — used where a
+   heading already conveys a field's purpose visually (see the answer
+   editor) but an explicit <label> is still needed for accessibility. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* WCAG 2.4.1 (Bypass Blocks): hidden until it receives keyboard focus,
+   so sighted keyboard users can jump past the (currently minimal, but
+   destined to grow) header/nav straight to the routed content. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: Canvas;
+  color: CanvasText;
+  padding: 0.5rem 1rem;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+#main-content:focus {
+  outline: none;
+}

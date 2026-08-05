@@ -1,0 +1,24 @@
+# Automated dependency-update PRs, covering the "keep dependencies
+# updated" half of implementation_plan.md's Section 7 security bullets
+# (docs/security-review.md). The other half of that bullet — enabling
+# GitHub's secret scanning and Dependabot *alerts* — is a repository
+# setting (Settings → Code security), not something a config file can
+# turn on; do that once per repo alongside adding this file.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Bundle routine patch/minor bumps into one PR instead of one per
+      # package; a small pilot project doesn't need a review queue full
+      # of individually trivial version bumps.
+      minor-and-patch:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
