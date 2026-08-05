@@ -1072,8 +1072,8 @@ begin
     raise exception 'This person is already a member of the group.' using errcode = '22023';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
-  v_token_hash := encode(digest(v_token, 'sha256'), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
+  v_token_hash := encode(extensions.digest(v_token, 'sha256'), 'hex');
 
   insert into invitations (group_id, email_normalized, token_hash, invited_by, expires_at)
   values (p_group_id, v_email, v_token_hash, auth.uid(), v_expires_at)
@@ -1132,8 +1132,8 @@ begin
     raise exception 'This invite can no longer be resent.' using errcode = '22023';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
-  v_token_hash := encode(digest(v_token, 'sha256'), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
+  v_token_hash := encode(extensions.digest(v_token, 'sha256'), 'hex');
 
   update invitations
   set token_hash = v_token_hash,

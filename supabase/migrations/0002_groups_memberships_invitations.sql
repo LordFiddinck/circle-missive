@@ -17,7 +17,19 @@
 --     for "someone joined a group" or "someone was removed", rather than
 --     a raw table update that could skip the audit trail.
 
-create extension if not exists pgcrypto;
+-- Supabase-hosted projects already have both the `extensions` schema
+-- and pgcrypto installed in it, so these two statements are no-ops
+-- there; `create schema if not exists` makes plain-Postgres CI (which
+-- starts with neither) match instead of erroring on "schema
+-- extensions does not exist". Every digest()/gen_random_bytes() call
+-- below is schema-qualified as extensions.digest(...) rather than
+-- relying on search_path, because the functions that use it set
+-- `search_path = public` (see each function's
+-- `security definer set search_path = public` clause) and would
+-- otherwise fail to resolve it when pgcrypto lives outside public —
+-- which is exactly what happens on a real Supabase project.
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
 
 create type membership_role as enum ('organizer', 'member');
 create type membership_status as enum ('active', 'removed', 'left');
@@ -343,8 +355,8 @@ begin
     raise exception 'This person is already a member of the group.' using errcode = '22023';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
-  v_token_hash := encode(digest(v_token, 'sha256'), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
+  v_token_hash := encode(extensions.digest(v_token, 'sha256'), 'hex');
 
   insert into invitations (group_id, email_normalized, token_hash, invited_by, expires_at)
   values (p_group_id, v_email, v_token_hash, auth.uid(), v_expires_at)
@@ -396,8 +408,8 @@ begin
     raise exception 'This invite can no longer be resent.' using errcode = '22023';
   end if;
 
-  v_token := encode(gen_random_bytes(32), 'hex');
-  v_token_hash := encode(digest(v_token, 'sha256'), 'hex');
+  v_token := encode(extensions.gen_random_bytes(32), 'hex');
+  v_token_hash := encode(extensions.digest(v_token, 'sha256'), 'hex');
 
   update invitations
   set token_hash = v_token_hash,
@@ -478,7 +490,7 @@ as $$
   from invitations i
   join groups g on g.id = i.group_id
   join profiles p on p.user_id = i.invited_by
-  where i.token_hash = encode(digest(p_token, 'sha256'), 'hex');
+  where i.token_hash = encode(extensions.digest(p_token, 'sha256'), 'hex');
 $$;
 
 grant execute on function get_invitation_preview(text) to anon, authenticated;
@@ -505,7 +517,7 @@ begin
 
   select * into v_invitation
   from invitations
-  where token_hash = encode(digest(p_token, 'sha256'), 'hex')
+  where token_hash = encode(extensions.digest(p_token, 'sha256'), 'hex')
   for update;
 
   if v_invitation.id is null then
