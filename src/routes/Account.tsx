@@ -42,8 +42,8 @@ export default function Account() {
       <h2>Email preferences</h2>
       <p>
         Invitations, phase updates, and deadline changes are always sent —
-        they&rsquo;re how the site brings you back at the right moments. The
-        two settings below are optional.
+        they&rsquo;re how the site brings you back at the right moments. The two
+        settings below are optional.
       </p>
 
       {preferences.isLoading ? (
@@ -83,8 +83,7 @@ export default function Account() {
                   })
                 }
               />{" "}
-              Announcements (published issues, question suggestions ending
-              soon)
+              Announcements (published issues, question suggestions ending soon)
             </label>
           </p>
 
