@@ -72,7 +72,9 @@ describe("QuestionWorkshop", () => {
 
     await screen.findByText(/no one has suggested a question yet/i);
     expect(
-      screen.queryByRole("heading", { name: /final questions for this cycle/i }),
+      screen.queryByRole("heading", {
+        name: /final questions for this cycle/i,
+      }),
     ).not.toBeInTheDocument();
   });
 });

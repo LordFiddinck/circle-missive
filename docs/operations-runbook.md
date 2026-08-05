@@ -80,12 +80,12 @@ criterion for Phase 5, not just a nice-to-have).
 All of these are Supabase **project secrets**, never frontend/Pages
 variables (see `README.md`'s deployment section):
 
-| Secret                 | Used by                              | Rotation notes                                                                                 |
-| ----------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `CRON_SECRET`           | `scheduler-tick`, `email-worker`      | Generate a new value (`openssl rand -hex 32`), `supabase secrets set`, then re-run `cron-setup.sql` with the new value before the old cron jobs next fire |
-| `RESEND_API_KEY`        | `email-worker`                        | Rotate in the Resend dashboard, then `supabase secrets set`                                     |
-| `RESEND_WEBHOOK_SECRET` | `resend-webhook`                      | Rotating invalidates in-flight webhook retries signed with the old secret — Resend will re-send; `resend-webhook` accepts either during a documented overlap window if you set both as candidates |
-| Supabase service-role key | all Edge Functions (`supabaseAdmin.ts`) | Rotate from the Supabase dashboard; this immediately invalidates the old key everywhere it's used, so redeploy functions promptly after |
+| Secret                    | Used by                                 | Rotation notes                                                                                                                                                                                    |
+| ------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CRON_SECRET`             | `scheduler-tick`, `email-worker`        | Generate a new value (`openssl rand -hex 32`), `supabase secrets set`, then re-run `cron-setup.sql` with the new value before the old cron jobs next fire                                         |
+| `RESEND_API_KEY`          | `email-worker`                          | Rotate in the Resend dashboard, then `supabase secrets set`                                                                                                                                       |
+| `RESEND_WEBHOOK_SECRET`   | `resend-webhook`                        | Rotating invalidates in-flight webhook retries signed with the old secret — Resend will re-send; `resend-webhook` accepts either during a documented overlap window if you set both as candidates |
+| Supabase service-role key | all Edge Functions (`supabaseAdmin.ts`) | Rotate from the Supabase dashboard; this immediately invalidates the old key everywhere it's used, so redeploy functions promptly after                                                           |
 
 ## Responding to a suspected data incident
 

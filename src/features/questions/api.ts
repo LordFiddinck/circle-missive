@@ -1,5 +1,9 @@
 import { supabase } from "@/lib/supabaseClient";
-import type { CycleQuestion, Profile, QuestionProposal } from "@/lib/database.types";
+import type {
+  CycleQuestion,
+  Profile,
+  QuestionProposal,
+} from "@/lib/database.types";
 
 export type ProposalWithAuthor = QuestionProposal & {
   author: Pick<Profile, "user_id" | "display_name"> | null;

@@ -93,12 +93,20 @@ create policy "email_preferences_update_own"
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+-- The one legitimate exception to this trigger's block is
+-- record_email_delivery_event() below, suppressing a user after a real
+-- bounce/complaint — a `security definer` function bypasses RLS and
+-- grants, but a table trigger fires regardless of privilege, so
+-- without an explicit exception that function would be blocked by its
+-- own safety net. `set_config(..., true)` makes the flag local to the
+-- current transaction, so it can't leak into any later statement.
 create function prevent_email_preferences_privileged_change()
 returns trigger
 language plpgsql
 as $$
 begin
-  if new.suppressed <> old.suppressed then
+  if new.suppressed <> old.suppressed
+     and coalesce(current_setting('circle_missive.allow_suppressed_change', true), '') <> 'on' then
     raise exception 'email_preferences.suppressed cannot be set directly.';
   end if;
   if new.unsubscribe_token <> old.unsubscribe_token then
@@ -502,16 +510,20 @@ begin
     update email_outbox set bounced_at = p_occurred_at
     where id = v_row.id and bounced_at is null;
     if v_row.recipient_user_id is not null then
+      perform set_config('circle_missive.allow_suppressed_change', 'on', true);
       update email_preferences set suppressed = true, updated_at = now()
       where user_id = v_row.recipient_user_id;
+      perform set_config('circle_missive.allow_suppressed_change', 'off', true);
     end if;
 
   elsif p_event_type = 'complained' then
     update email_outbox set complained_at = p_occurred_at
     where id = v_row.id and complained_at is null;
     if v_row.recipient_user_id is not null then
+      perform set_config('circle_missive.allow_suppressed_change', 'on', true);
       update email_preferences set suppressed = true, updated_at = now()
       where user_id = v_row.recipient_user_id;
+      perform set_config('circle_missive.allow_suppressed_change', 'off', true);
     end if;
   end if;
 end;

@@ -7,16 +7,9 @@ export type MembershipRole = "organizer" | "member";
 export type MembershipStatus = "active" | "removed" | "left";
 export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired";
 export type CyclePhase =
-  | "question_collection"
-  | "answering"
-  | "published"
-  | "skipped";
+  "question_collection" | "answering" | "published" | "skipped";
 export type EmailOutboxStatus =
-  | "pending"
-  | "sending"
-  | "sent"
-  | "skipped"
-  | "failed";
+  "pending" | "sending" | "sent" | "skipped" | "failed";
 export type EmailCategory = "transactional" | "reminders" | "announcements";
 
 export type Profile = {

@@ -15,7 +15,10 @@ const PHASE_LABELS: Record<string, string> = {
 };
 
 export default function CycleDetail() {
-  const { groupId, cycleId } = useParams<{ groupId: string; cycleId: string }>();
+  const { groupId, cycleId } = useParams<{
+    groupId: string;
+    cycleId: string;
+  }>();
   const { session } = useSession();
   const cycle = useCycle(cycleId);
   const members = useMembers(groupId);
