@@ -17,7 +17,11 @@ const answers = [
     submitted_at: null,
     created_at: "2026-01-01T00:00:00.000Z",
     updated_at: "2026-01-01T00:00:00.000Z",
-    question: { id: "question-1", text: "What made you laugh this week?", position: 0 },
+    question: {
+      id: "question-1",
+      text: "What made you laugh this week?",
+      position: 0,
+    },
   },
 ];
 
@@ -60,7 +64,9 @@ describe("AnswerEditor", () => {
     // heading and a sr-only <label> for the textarea), so a plain
     // findByText match is ambiguous — scope to the heading role.
     expect(
-      await screen.findByRole("heading", { name: /what made you laugh this week\?/i }),
+      await screen.findByRole("heading", {
+        name: /what made you laugh this week\?/i,
+      }),
     ).toBeInTheDocument();
 
     const submit = screen.getByRole("button", { name: /submit answers/i });
