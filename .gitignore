@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Local env files — .env.example is the template and IS tracked;
+# anything with .local or a bare .env is real config and never is.
+.env
+.env.local
+.env.*.local
+supabase/functions/.env.local
+
+# Supabase CLI local/machine-specific state — created by `supabase
+# link`, `supabase start`, etc. None of it belongs in the repo; it's
+# what caused supabase/.temp/linked-project.json to get committed
+# before this file existed.
+supabase/.temp/
+supabase/.branches/
+
+# Test/build tooling output
+coverage/
+playwright-report/
+test-results/
+/blob-report/
+/playwright/.cache/
+
+# Editor/OS
+.DS_Store
+.vscode/
+.idea/
+
+*.log
+npm-debug.log*
