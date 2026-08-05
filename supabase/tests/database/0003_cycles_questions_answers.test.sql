@@ -55,8 +55,8 @@ select throws_ok(
 select tests.authenticate_as(:'alice_uid');
 select id as cycle_a1_id, sequence_no as cycle_a1_seq, phase as cycle_a1_phase
   from start_cycle(:'group_a_id'::uuid) \gset
-select is(:'cycle_a1_seq', '1', 'the first cycle is sequence number 1');
-select is(:'cycle_a1_phase', 'question_collection', 'a new cycle opens in question_collection');
+select is(:'cycle_a1_seq'::text, '1', 'the first cycle is sequence number 1');
+select is(:'cycle_a1_phase'::text, 'question_collection', 'a new cycle opens in question_collection');
 
 select throws_ok(
   format('select start_cycle(%L)', :'group_a_id'),

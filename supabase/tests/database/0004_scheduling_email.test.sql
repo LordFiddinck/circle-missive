@@ -78,6 +78,7 @@ select throws_ok(
 select throws_ok(
   $$select enqueue_email('x', null, 'a@example.com', 'group_invitation', '{}'::jsonb, null, 'transactional')$$,
   '42501',
+  'permission denied for function enqueue_email',
   'an authenticated (non-service-role) caller cannot enqueue mail directly'
 );
 
@@ -367,6 +368,7 @@ select tests.authenticate_as(:'alice_uid');
 select throws_ok(
   'select * from get_operational_health()',
   '42501',
+  'permission denied for function get_operational_health',
   'a regular authenticated user cannot read operational health'
 );
 
