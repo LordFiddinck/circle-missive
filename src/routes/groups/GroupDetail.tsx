@@ -30,6 +30,9 @@ export default function GroupDetail() {
   if (group.isLoading || members.isLoading) {
     return (
       <main>
+        <p>
+          <Link to="/">&larr; Back to your groups</Link>
+        </p>
         <p role="status">Loading group…</p>
       </main>
     );
@@ -38,6 +41,9 @@ export default function GroupDetail() {
   if (group.isError || !group.data) {
     return (
       <main>
+        <p>
+          <Link to="/">&larr; Back to your groups</Link>
+        </p>
         <h1>Group not found</h1>
         <p>
           Either this group doesn&rsquo;t exist, or you&rsquo;re no longer a
@@ -61,6 +67,10 @@ export default function GroupDetail() {
 
   return (
     <main>
+      <p>
+        <Link to="/">&larr; Back to your groups</Link>
+      </p>
+
       <GroupSettings group={group.data} />
 
       <section aria-labelledby="cycle-heading">
