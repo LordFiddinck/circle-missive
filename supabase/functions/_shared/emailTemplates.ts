@@ -144,6 +144,7 @@ export function renderEmail(row: OutboxRow, unsubscribeToken: string | null): Re
         bodyLines: [
           `Someone from ${groupName} invited you to join their private, recurring question-and-answer circle.`,
           `This invite link expires ${formatDate(payload.expires_at)}.`,
+          `You'll need to verify your email address first. After you click the sign-in link we send you, you should land back on this invite automatically \u2014 if you don't, just come back to this email and click the button below again.`,
         ],
         ctaLabel: "Accept invitation",
         ctaUrl: inviteUrl(payload.invite_token),
@@ -158,6 +159,7 @@ export function renderEmail(row: OutboxRow, unsubscribeToken: string | null): Re
         bodyLines: [
           `This is a reminder that you have a pending invitation to ${groupName}.`,
           `This invite link expires ${formatDate(payload.expires_at)}.`,
+          `You'll need to verify your email address first. After you click the sign-in link we send you, you should land back on this invite automatically \u2014 if you don't, just come back to this email and click the button below again.`,
         ],
         ctaLabel: "Accept invitation",
         ctaUrl: inviteUrl(payload.invite_token),
