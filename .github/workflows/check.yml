@@ -15,7 +15,7 @@ jobs:
     name: Format, lint, typecheck, unit tests, build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
@@ -48,7 +48,7 @@ jobs:
       PGPASSWORD: postgres
       PGDATABASE: circle_missive_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # ubuntu-latest ships a postgresql-client but not a server, and
       # its default apt repos don't carry a pgtap package for every
