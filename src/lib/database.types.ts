@@ -232,6 +232,20 @@ export type Database = {
         Args: { p_token: string };
         Returns: { accepted_group_id: string }[];
       };
+      list_my_pending_invitations: {
+        Args: Record<string, never>;
+        Returns: {
+          invitation_id: string;
+          group_id: string;
+          group_name: string;
+          inviter_display_name: string;
+          expires_at: string;
+        }[];
+      };
+      accept_invitation_by_id: {
+        Args: { p_invitation_id: string };
+        Returns: { accepted_group_id: string }[];
+      };
       remove_member: {
         Args: { p_group_id: string; p_user_id: string };
         Returns: undefined;
