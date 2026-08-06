@@ -13,7 +13,9 @@ export async function fetchCycles(groupId: string): Promise<Cycle[]> {
 }
 
 /** The one cycle (if any) currently open for question collection or answering. */
-export async function fetchCurrentCycle(groupId: string): Promise<Cycle | null> {
+export async function fetchCurrentCycle(
+  groupId: string,
+): Promise<Cycle | null> {
   const { data, error } = await supabase
     .from("cycles")
     .select("*")

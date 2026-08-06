@@ -40,7 +40,10 @@ export function QuestionWorkshop({
   async function handleSaveEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editingId) return;
-    await updateProposal.mutateAsync({ id: editingId, text: editingText.trim() });
+    await updateProposal.mutateAsync({
+      id: editingId,
+      text: editingText.trim(),
+    });
     setEditingId(null);
   }
 
@@ -124,7 +127,9 @@ export function QuestionWorkshop({
               <li key={proposal.id}>
                 {isEditing ? (
                   <form onSubmit={handleSaveEdit}>
-                    <label htmlFor={`edit-${proposal.id}`}>Edit suggestion</label>
+                    <label htmlFor={`edit-${proposal.id}`}>
+                      Edit suggestion
+                    </label>
                     <input
                       id={`edit-${proposal.id}`}
                       type="text"
@@ -222,7 +227,10 @@ export function QuestionWorkshop({
                   >
                     Move down
                   </button>
-                  <button type="button" onClick={() => toggleSelected(proposal.id)}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSelected(proposal.id)}
+                  >
                     Remove
                   </button>
                 </li>

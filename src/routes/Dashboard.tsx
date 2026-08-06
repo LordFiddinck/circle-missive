@@ -2,10 +2,13 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { useSession } from "@/lib/useSession";
 import { useGroups } from "@/features/groups/queries";
+import { useMyPendingInvitations } from "@/features/invitations/queries";
+import { PendingInvitations } from "@/features/invitations/PendingInvitations";
 
 export default function Dashboard() {
   const { session } = useSession();
   const groups = useGroups();
+  const pendingInvitations = useMyPendingInvitations(session?.user.id);
 
   return (
     <main>
@@ -13,6 +16,16 @@ export default function Dashboard() {
       <p>
         Signed in as <strong>{session?.user.email}</strong>.
       </p>
+
+      {pendingInvitations.isLoading ? (
+        <p role="status">Checking for pending invites…</p>
+      ) : null}
+      {pendingInvitations.isError ? (
+        <p role="alert">Could not load your pending invites.</p>
+      ) : null}
+      {pendingInvitations.data ? (
+        <PendingInvitations invitations={pendingInvitations.data} />
+      ) : null}
 
       {groups.isLoading ? <p role="status">Loading your groups…</p> : null}
       {groups.isError ? <p role="alert">Could not load your groups.</p> : null}

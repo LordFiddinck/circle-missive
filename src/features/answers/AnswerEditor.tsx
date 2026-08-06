@@ -17,7 +17,12 @@ type AnswerFieldProps = {
   onFilledChange: (answerId: string, filled: boolean) => void;
 };
 
-function AnswerField({ answer, index, onSave, onFilledChange }: AnswerFieldProps) {
+function AnswerField({
+  answer,
+  index,
+  onSave,
+  onFilledChange,
+}: AnswerFieldProps) {
   const [value, setValue] = useState(answer.body);
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [recovered, setRecovered] = useState(false);
@@ -141,15 +146,20 @@ export function AnswerEditor({ groupId, cycleId }: AnswerEditorProps) {
   const answers = useMyAnswers(cycleId);
   const saveDraft = useSaveAnswerDraft(cycleId);
   const submitAnswers = useSubmitAnswers(groupId, cycleId);
-  const [filledOverrides, setFilledOverrides] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [filledOverrides, setFilledOverrides] = useState<
+    Record<string, boolean>
+  >({});
 
-  const handleFilledChange = useCallback((answerId: string, filled: boolean) => {
-    setFilledOverrides((current) =>
-      current[answerId] === filled ? current : { ...current, [answerId]: filled },
-    );
-  }, []);
+  const handleFilledChange = useCallback(
+    (answerId: string, filled: boolean) => {
+      setFilledOverrides((current) =>
+        current[answerId] === filled
+          ? current
+          : { ...current, [answerId]: filled },
+      );
+    },
+    [],
+  );
 
   async function handleSave(answerId: string, body: string) {
     return saveDraft.mutateAsync({ answerId, body });

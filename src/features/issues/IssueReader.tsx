@@ -52,7 +52,10 @@ function LateAnswerForm({
         rows={4}
         required
       />
-      <button type="submit" disabled={submitLateAnswer.isPending || body.trim() === ""}>
+      <button
+        type="submit"
+        disabled={submitLateAnswer.isPending || body.trim() === ""}
+      >
         {submitLateAnswer.isPending ? "Adding…" : "Add answer"}
       </button>
       <button type="button" onClick={() => setOpen(false)}>

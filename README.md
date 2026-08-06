@@ -78,14 +78,14 @@ ahead.
 
 ## Scripts
 
-| Command                           | Purpose                                                 |
-| --------------------------------- | ------------------------------------------------------- |
-| `npm run dev`                     | Local dev server                                        |
-| `npm run build`                   | Type-checked production build                           |
-| `npm run lint`                    | ESLint                                                  |
-| `npm run format` / `format:check` | Prettier                                                |
-| `npm run typecheck`               | `tsc --noEmit`                                          |
-| `npm test`                        | Vitest unit/component tests                             |
+| Command                           | Purpose                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`                     | Local dev server                                                           |
+| `npm run build`                   | Type-checked production build                                              |
+| `npm run lint`                    | ESLint                                                                     |
+| `npm run format` / `format:check` | Prettier                                                                   |
+| `npm run typecheck`               | `tsc --noEmit`                                                             |
+| `npm test`                        | Vitest unit/component tests                                                |
 | `npm run e2e`                     | Playwright end-to-end tests — scaffolding only so far, see `e2e/README.md` |
 
 ## Deployment
@@ -152,7 +152,7 @@ Functions and cron jobs are deployed separately (not yet wired into CI):
 - Scheduling: `next_action_at` + `scheduler_tick()` auto-publish a cycle
   and start the next one at the deadline, send deadline reminders to
   members who haven't submitted, and nudge organizers about an overdue,
-  unfinalized question phase (automatic question *selection* is
+  unfinalized question phase (automatic question _selection_ is
   deliberately out of scope — see `0004_scheduling_email.sql`'s header
   comment)
 - Email: a durable outbox with dedupe, capped-backoff retries, and

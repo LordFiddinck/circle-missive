@@ -7,16 +7,9 @@ export type MembershipRole = "organizer" | "member";
 export type MembershipStatus = "active" | "removed" | "left";
 export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired";
 export type CyclePhase =
-  | "question_collection"
-  | "answering"
-  | "published"
-  | "skipped";
+  "question_collection" | "answering" | "published" | "skipped";
 export type EmailOutboxStatus =
-  | "pending"
-  | "sending"
-  | "sent"
-  | "skipped"
-  | "failed";
+  "pending" | "sending" | "sent" | "skipped" | "failed";
 export type EmailCategory = "transactional" | "reminders" | "announcements";
 
 export type Profile = {
@@ -237,6 +230,20 @@ export type Database = {
       };
       accept_invitation: {
         Args: { p_token: string };
+        Returns: { accepted_group_id: string }[];
+      };
+      list_my_pending_invitations: {
+        Args: Record<string, never>;
+        Returns: {
+          invitation_id: string;
+          group_id: string;
+          group_name: string;
+          inviter_display_name: string;
+          expires_at: string;
+        }[];
+      };
+      accept_invitation_by_id: {
+        Args: { p_invitation_id: string };
         Returns: { accepted_group_id: string }[];
       };
       remove_member: {

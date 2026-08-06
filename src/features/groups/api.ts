@@ -50,7 +50,9 @@ export async function fetchMembers(
 ): Promise<MemberWithProfile[]> {
   const { data, error } = await supabase
     .from("memberships")
-    .select("*, profile:profiles(user_id, display_name)")
+    .select(
+      "*, profile:profiles!memberships_user_id_fkey(user_id, display_name)",
+    )
     .eq("group_id", groupId)
     .eq("status", "active")
     .order("joined_at", { ascending: true });

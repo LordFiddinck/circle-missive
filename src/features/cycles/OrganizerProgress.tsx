@@ -19,7 +19,10 @@ function toLocalDateTimeInputValue(iso: string): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export function OrganizerProgress({ groupId, cycleId }: OrganizerProgressProps) {
+export function OrganizerProgress({
+  groupId,
+  cycleId,
+}: OrganizerProgressProps) {
   const cycle = useCycle(cycleId);
   const progress = useCycleProgress(cycleId);
   const reopenSubmission = useReopenSubmission(cycleId);
@@ -109,7 +112,8 @@ export function OrganizerProgress({ groupId, cycleId }: OrganizerProgressProps) 
       {deadlineLabel ? (
         <form onSubmit={handleChangeDeadline}>
           <label htmlFor="new-deadline">
-            Change deadline (currently {new Date(deadlineLabel).toLocaleString()})
+            Change deadline (currently{" "}
+            {new Date(deadlineLabel).toLocaleString()})
           </label>
           <input
             id="new-deadline"
