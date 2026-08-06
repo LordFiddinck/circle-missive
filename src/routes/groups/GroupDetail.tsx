@@ -31,7 +31,9 @@ export default function GroupDetail() {
     return (
       <main>
         <p>
-          <Link to="/">&larr; Back to your groups</Link>
+          <Link to="/">&larr; Back to dashboard</Link>
+          {" · "}
+          <Link to="/account">Change your name</Link>
         </p>
         <p role="status">Loading group…</p>
       </main>
@@ -42,7 +44,7 @@ export default function GroupDetail() {
     return (
       <main>
         <p>
-          <Link to="/">&larr; Back to your groups</Link>
+          <Link to="/">&larr; Back to dashboard</Link>
         </p>
         <h1>Group not found</h1>
         <p>
@@ -68,7 +70,9 @@ export default function GroupDetail() {
   return (
     <main>
       <p>
-        <Link to="/">&larr; Back to your groups</Link>
+        <Link to="/">&larr; Back to dashboard</Link>
+        {" · "}
+        <Link to="/account">Change your name</Link>
       </p>
 
       <GroupSettings group={group.data} />
