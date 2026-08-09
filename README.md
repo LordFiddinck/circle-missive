@@ -1,4 +1,4 @@
-# Circle Missive 
+# Circle Missive
 
 A private, recurring group Q&A site. See `implementation_plan.md` (repo
 root, alongside this README once you copy it in) for the full product and
