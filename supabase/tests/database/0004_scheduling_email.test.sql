@@ -201,6 +201,9 @@ select lives_ok(
   format('select unsubscribe_by_token(%L, %L)', :'bob_unsub_token', 'announcements'),
   'unsubscribing works while signed out, given a valid token'
 );
+
+select tests.authenticate_as(:'bob_uid');
+
 select is(
   (select announcements_enabled from email_preferences where user_id = :'bob_uid'),
   false,
