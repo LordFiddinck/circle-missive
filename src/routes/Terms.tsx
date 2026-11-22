@@ -4,7 +4,7 @@ import { LegalFooter } from "@/components/LegalFooter";
 export default function Terms() {
   return (
     <main>
-      <p>
+      <p className="back-link">
         <Link to="/sign-in">&larr; Back to sign in</Link>
       </p>
 

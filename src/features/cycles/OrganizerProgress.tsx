@@ -44,7 +44,7 @@ export function OrganizerProgress({
       progress.data?.filter((member) => !member.submitted).length ?? 0;
     const warning =
       notSubmitted > 0
-        ? `${notSubmitted} member${notSubmitted === 1 ? " hasn't" : "s haven't"} submitted yet — their answers won't appear until they submit late. `
+        ? `${notSubmitted} member${notSubmitted === 1 ? " hasn't" : "s haven't"} submitted yet. Any answers they've saved will be submitted for them; questions they left blank can be added later. `
         : "";
     if (!window.confirm(`${warning}Publish this cycle's issue now?`)) return;
     await publishCycle.mutateAsync();
@@ -75,18 +75,22 @@ export function OrganizerProgress({
       : cycle.data.answer_due_at;
 
   return (
-    <section aria-labelledby="organizer-progress-heading">
+    <section aria-labelledby="organizer-progress-heading" className="panel">
       <h2 id="organizer-progress-heading">Progress (organizer only)</h2>
 
       {cycle.data.phase === "answering" ? (
-        <ul aria-label="Member completion">
+        <ul aria-label="Member completion" className="rows">
           {progress.data?.map((member) => (
             <li key={member.user_id}>
-              <span>
-                {member.display_name} — {member.questions_answered}/
-                {member.questions_total} answered
-                {member.submitted ? ", submitted" : ""}
+              <span className="row-main">
+                <span className="row-title">{member.display_name}</span>
+                <span className="row-sub">
+                  {member.questions_answered}/{member.questions_total} answered
+                </span>
               </span>
+              {member.submitted ? (
+                <span className="badge">Submitted</span>
+              ) : null}
               {member.submitted ? (
                 <button
                   type="button"
@@ -121,7 +125,11 @@ export function OrganizerProgress({
             value={newDeadline || toLocalDateTimeInputValue(deadlineLabel)}
             onChange={(event) => setNewDeadline(event.target.value)}
           />
-          <button type="submit" disabled={changeDeadline.isPending}>
+          <button
+            type="submit"
+            className="quiet"
+            disabled={changeDeadline.isPending}
+          >
             {changeDeadline.isPending ? "Saving…" : "Update deadline"}
           </button>
           {changeDeadline.isError ? (
@@ -134,15 +142,26 @@ export function OrganizerProgress({
         </form>
       ) : null}
 
-      {cycle.data.phase === "answering" ? (
+      <div className="actions">
+        {cycle.data.phase === "answering" ? (
+          <button
+            type="button"
+            className="primary"
+            onClick={handlePublish}
+            disabled={publishCycle.isPending}
+          >
+            {publishCycle.isPending ? "Publishing…" : "Publish this issue now"}
+          </button>
+        ) : null}
         <button
           type="button"
-          onClick={handlePublish}
-          disabled={publishCycle.isPending}
+          className="danger"
+          onClick={handleSkip}
+          disabled={skipCycle.isPending}
         >
-          {publishCycle.isPending ? "Publishing…" : "Publish this issue now"}
+          {skipCycle.isPending ? "Skipping…" : "Skip this cycle"}
         </button>
-      ) : null}
+      </div>
       {publishCycle.isError ? (
         <p role="alert">
           {publishCycle.error instanceof Error
@@ -150,10 +169,6 @@ export function OrganizerProgress({
             : "Could not publish this cycle."}
         </p>
       ) : null}
-
-      <button type="button" onClick={handleSkip} disabled={skipCycle.isPending}>
-        {skipCycle.isPending ? "Skipping…" : "Skip this cycle"}
-      </button>
       {skipCycle.isError ? (
         <p role="alert">
           {skipCycle.error instanceof Error

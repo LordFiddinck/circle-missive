@@ -41,29 +41,31 @@ export function EmailActivity({ groupId }: EmailActivityProps) {
           outbox in Supabase, or ask a maintainer.
         </p>
       ) : null}
-      <table>
-        <caption className="sr-only">
-          Email activity for this group, by template and status
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Notification</th>
-            <th scope="col">Status</th>
-            <th scope="col">Count</th>
-            <th scope="col">Most recent</th>
-          </tr>
-        </thead>
-        <tbody>
-          {activity.data.map((row) => (
-            <tr key={`${row.template}:${row.status}`}>
-              <td>{row.template.replaceAll("_", " ")}</td>
-              <td>{STATUS_LABELS[row.status] ?? row.status}</td>
-              <td>{row.message_count}</td>
-              <td>{new Date(row.most_recent).toLocaleString()}</td>
+      <div className="table-wrap">
+        <table>
+          <caption className="sr-only">
+            Email activity for this group, by template and status
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Notification</th>
+              <th scope="col">Status</th>
+              <th scope="col">Count</th>
+              <th scope="col">Most recent</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {activity.data.map((row) => (
+              <tr key={`${row.template}:${row.status}`}>
+                <td>{row.template.replaceAll("_", " ")}</td>
+                <td>{STATUS_LABELS[row.status] ?? row.status}</td>
+                <td>{row.message_count}</td>
+                <td>{new Date(row.most_recent).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

@@ -4,6 +4,7 @@ import {
   useDeleteProposal,
   useFinalizeQuestions,
   useProposals,
+  useReleaseQuestions,
   useUpdateProposal,
 } from "./queries";
 
@@ -13,6 +14,27 @@ type QuestionWorkshopProps = {
   currentUserId: string;
   isOrganizer: boolean;
 };
+
+/**
+ * Who a suggestion is credited to, as seen by the viewer. An author who
+ * chose to hide their name stays "Anonymous" to everyone else; they can
+ * still see (and change) their own setting.
+ */
+function attributionLabel(
+  proposal: {
+    show_author: boolean;
+    author: { display_name: string } | null;
+  },
+  isOwn: boolean,
+): string {
+  if (isOwn) {
+    return proposal.show_author ? "you" : "you — name hidden from others";
+  }
+  if (proposal.show_author) {
+    return proposal.author?.display_name || "(no name set)";
+  }
+  return "Anonymous";
+}
 
 export function QuestionWorkshop({
   groupId,
@@ -25,15 +47,20 @@ export function QuestionWorkshop({
   const updateProposal = useUpdateProposal(cycleId);
   const deleteProposal = useDeleteProposal(cycleId);
   const finalizeQuestions = useFinalizeQuestions(groupId, cycleId);
+  const releaseQuestions = useReleaseQuestions(groupId, cycleId);
 
   const [newText, setNewText] = useState("");
+  const [showMyName, setShowMyName] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   async function handlePropose(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await createProposal.mutateAsync(newText.trim());
+    await createProposal.mutateAsync({
+      text: newText.trim(),
+      showAuthor: showMyName,
+    });
     setNewText("");
   }
 
@@ -77,6 +104,19 @@ export function QuestionWorkshop({
     await finalizeQuestions.mutateAsync(selectedIds);
   }
 
+  async function handleRelease() {
+    const count = proposals.data?.length ?? 0;
+    if (count === 0) return;
+    if (
+      !window.confirm(
+        `Release all ${count} suggested question${count === 1 ? "" : "s"} now, in the order they were suggested? Members can start answering right away, and no more suggestions can be added.`,
+      )
+    ) {
+      return;
+    }
+    await releaseQuestions.mutateAsync();
+  }
+
   if (proposals.isLoading) {
     return <p role="status">Loading suggested questions…</p>;
   }
@@ -104,6 +144,15 @@ export function QuestionWorkshop({
           value={newText}
           onChange={(event) => setNewText(event.target.value)}
         />
+        <label htmlFor="new-proposal-show-name">
+          <input
+            id="new-proposal-show-name"
+            type="checkbox"
+            checked={showMyName}
+            onChange={(event) => setShowMyName(event.target.checked)}
+          />{" "}
+          Show my name on this question
+        </label>
         <button
           type="submit"
           disabled={createProposal.isPending || newText.trim() === ""}
@@ -119,7 +168,7 @@ export function QuestionWorkshop({
       {items.length === 0 ? (
         <p>No one has suggested a question yet.</p>
       ) : (
-        <ul aria-label="Suggested questions">
+        <ul aria-label="Suggested questions" className="rows">
           {items.map((proposal) => {
             const isOwn = proposal.author_id === currentUserId;
             const isEditing = editingId === proposal.id;
@@ -153,13 +202,29 @@ export function QuestionWorkshop({
                   </form>
                 ) : (
                   <>
-                    <span>
-                      {proposal.text} —{" "}
-                      {proposal.author?.display_name || "(no name set)"}
-                      {isOwn ? " (you)" : ""}
+                    <span className="row-main">
+                      <span className="row-title">{proposal.text}</span>
+                      <span className="row-sub">
+                        {attributionLabel(proposal, isOwn)}
+                      </span>
                     </span>
                     {isOwn ? (
                       <>
+                        <label htmlFor={`show-name-${proposal.id}`}>
+                          <input
+                            id={`show-name-${proposal.id}`}
+                            type="checkbox"
+                            checked={proposal.show_author}
+                            disabled={updateProposal.isPending}
+                            onChange={(event) =>
+                              updateProposal.mutate({
+                                id: proposal.id,
+                                show_author: event.target.checked,
+                              })
+                            }
+                          />{" "}
+                          Show my name
+                        </label>
                         <button
                           type="button"
                           onClick={() => {
@@ -171,6 +236,7 @@ export function QuestionWorkshop({
                         </button>
                         <button
                           type="button"
+                          className="danger"
                           onClick={() => {
                             if (window.confirm("Remove this suggestion?")) {
                               deleteProposal.mutate(proposal.id);
@@ -204,15 +270,18 @@ export function QuestionWorkshop({
       )}
 
       {isOrganizer ? (
-        <section aria-labelledby="final-questions-heading">
+        <section aria-labelledby="final-questions-heading" className="panel">
           <h3 id="final-questions-heading">Final questions for this cycle</h3>
           {selectedProposals.length === 0 ? (
             <p>Select suggestions above to build the final, ordered list.</p>
           ) : (
-            <ol aria-label="Selected questions, in answering order">
+            <ol
+              aria-label="Selected questions, in answering order"
+              className="rows"
+            >
               {selectedProposals.map((proposal, index) => (
                 <li key={proposal.id}>
-                  {proposal.text}
+                  <span className="row-main">{proposal.text}</span>
                   <button
                     type="button"
                     onClick={() => moveSelected(index, -1)}
@@ -229,6 +298,7 @@ export function QuestionWorkshop({
                   </button>
                   <button
                     type="button"
+                    className="danger"
                     onClick={() => toggleSelected(proposal.id)}
                   >
                     Remove
@@ -239,6 +309,7 @@ export function QuestionWorkshop({
           )}
           <button
             type="button"
+            className="primary"
             onClick={handleFinalize}
             disabled={selectedIds.length === 0 || finalizeQuestions.isPending}
           >
@@ -251,6 +322,28 @@ export function QuestionWorkshop({
               {finalizeQuestions.error instanceof Error
                 ? finalizeQuestions.error.message
                 : "Could not finalize these questions."}
+            </p>
+          ) : null}
+
+          <h4>Or release everything at once</h4>
+          <p>
+            Skip picking and open answering now with every suggestion above, in
+            the order they were suggested.
+          </p>
+          <button
+            type="button"
+            onClick={handleRelease}
+            disabled={items.length === 0 || releaseQuestions.isPending}
+          >
+            {releaseQuestions.isPending
+              ? "Releasing…"
+              : `Release all ${items.length || ""} suggestion${items.length === 1 ? "" : "s"} now`}
+          </button>
+          {releaseQuestions.isError ? (
+            <p role="alert">
+              {releaseQuestions.error instanceof Error
+                ? releaseQuestions.error.message
+                : "Could not release the questions."}
             </p>
           ) : null}
         </section>

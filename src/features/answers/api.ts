@@ -1,8 +1,11 @@
 import { supabase } from "@/lib/supabaseClient";
-import type { Answer, CycleQuestion } from "@/lib/database.types";
+import type { Answer, CycleQuestion, Profile } from "@/lib/database.types";
 
 export type AnswerWithQuestion = Answer & {
-  question: Pick<CycleQuestion, "id" | "text" | "position">;
+  question: Pick<CycleQuestion, "id" | "text" | "position" | "asked_by"> & {
+    /** Present only when the proposer chose to show their name. */
+    asker?: Pick<Profile, "user_id" | "display_name"> | null;
+  };
 };
 
 /**
@@ -15,11 +18,21 @@ export async function fetchMyAnswers(
 ): Promise<AnswerWithQuestion[]> {
   const { data, error } = await supabase
     .from("answers")
-    .select("*, question:cycle_questions!inner(id, text, position)")
-    .eq("question.cycle_id", cycleId)
-    .order("position", { referencedTable: "question" });
+    .select(
+      "*, question:cycle_questions!inner(id, text, position, asked_by, asker:profiles(user_id, display_name))",
+    )
+    .eq("question.cycle_id", cycleId);
   if (error) throw error;
-  return data as unknown as AnswerWithQuestion[];
+
+  // Sort here, not in the query. PostgREST's `order(..., { referencedTable })`
+  // only orders the embedded question *inside* each row — it never orders
+  // the answer rows themselves, so the API returns them in physical
+  // (heap) order. Every autosave UPDATE rewrites a row and moves it, which
+  // is what made the questions reshuffle while people were typing.
+  // `position` is unique per cycle, so this is a total, stable order.
+  return (data as unknown as AnswerWithQuestion[])
+    .slice()
+    .sort((a, b) => a.question.position - b.question.position);
 }
 
 export async function saveAnswerDraft(

@@ -9,9 +9,7 @@ export function LegalFooter() {
     <footer>
       <nav aria-label="Legal and help">
         <Link to="/privacy">Privacy</Link>
-        {" · "}
         <Link to="/terms">Terms</Link>
-        {" · "}
         <Link to="/help">Help</Link>
       </nav>
     </footer>

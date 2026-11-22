@@ -31,7 +31,7 @@ export function InviteForm({ groupId }: InviteFormProps) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="inline-form">
         <label htmlFor="invite-email">Invite by email</label>
         <input
           id="invite-email"

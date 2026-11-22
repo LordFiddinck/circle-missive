@@ -7,6 +7,7 @@ import { MemberList } from "@/features/groups/MemberList";
 import { useGroup, useLeaveGroup, useMembers } from "@/features/groups/queries";
 import { useCurrentCycle, useStartCycle } from "@/features/cycles/queries";
 import { EmailActivity } from "@/features/notifications/EmailActivity";
+import { AnswerVisibility } from "@/features/visibility/AnswerVisibility";
 
 const PHASE_LABELS: Record<string, string> = {
   question_collection: "Collecting questions",
@@ -30,10 +31,8 @@ export default function GroupDetail() {
   if (group.isLoading || members.isLoading) {
     return (
       <main>
-        <p>
+        <p className="back-link">
           <Link to="/">&larr; Back to dashboard</Link>
-          {" · "}
-          <Link to="/account">Change your name</Link>
         </p>
         <p role="status">Loading group…</p>
       </main>
@@ -43,7 +42,7 @@ export default function GroupDetail() {
   if (group.isError || !group.data) {
     return (
       <main>
-        <p>
+        <p className="back-link">
           <Link to="/">&larr; Back to dashboard</Link>
         </p>
         <h1>Group not found</h1>
@@ -69,10 +68,8 @@ export default function GroupDetail() {
 
   return (
     <main>
-      <p>
+      <p className="back-link">
         <Link to="/">&larr; Back to dashboard</Link>
-        {" · "}
-        <Link to="/account">Change your name</Link>
       </p>
 
       <GroupSettings group={group.data} />
@@ -84,18 +81,22 @@ export default function GroupDetail() {
           <p role="alert">Could not load this group&rsquo;s current cycle.</p>
         ) : null}
         {currentCycle.isSuccess && currentCycle.data ? (
-          <p>
-            <Link to={`/groups/${groupId}/cycles/${currentCycle.data.id}`}>
-              Cycle #{currentCycle.data.sequence_no} —{" "}
+          <Link
+            className="cycle-card"
+            to={`/groups/${groupId}/cycles/${currentCycle.data.id}`}
+          >
+            <span>Cycle #{currentCycle.data.sequence_no}</span>
+            <span className="badge">
               {PHASE_LABELS[currentCycle.data.phase] ?? currentCycle.data.phase}
-            </Link>
-          </p>
+            </span>
+          </Link>
         ) : currentCycle.isSuccess ? (
           <>
             <p>No cycle is open right now.</p>
             {isOrganizer ? (
               <button
                 type="button"
+                className="primary"
                 onClick={() => startCycle.mutate()}
                 disabled={startCycle.isPending}
               >
@@ -126,7 +127,7 @@ export default function GroupDetail() {
       </section>
 
       {isOrganizer ? (
-        <section aria-labelledby="invitations-heading">
+        <section aria-labelledby="invitations-heading" className="panel">
           <h2 id="invitations-heading">Invitations</h2>
           <InviteForm groupId={groupId} />
           <InvitationList groupId={groupId} />
@@ -134,7 +135,14 @@ export default function GroupDetail() {
       ) : null}
 
       {isOrganizer ? (
-        <section aria-labelledby="email-activity-heading">
+        <section aria-labelledby="answer-visibility-heading" className="panel">
+          <h2 id="answer-visibility-heading">Answer visibility</h2>
+          <AnswerVisibility groupId={groupId} />
+        </section>
+      ) : null}
+
+      {isOrganizer ? (
+        <section aria-labelledby="email-activity-heading" className="panel">
           <h2 id="email-activity-heading">Email activity</h2>
           <EmailActivity groupId={groupId} />
         </section>
@@ -143,6 +151,7 @@ export default function GroupDetail() {
       <section>
         <button
           type="button"
+          className="danger"
           onClick={handleLeave}
           disabled={leaveGroup.isPending}
         >

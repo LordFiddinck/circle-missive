@@ -28,16 +28,20 @@ export function Archive({ groupId }: ArchiveProps) {
   }
 
   return (
-    <ul aria-label="Cycle archive">
+    <ul aria-label="Cycle archive" className="rows links">
       {cycles.data.map((cycle) => (
         <li key={cycle.id}>
           <Link to={`/groups/${groupId}/cycles/${cycle.id}`}>
-            Cycle #{cycle.sequence_no}
-          </Link>{" "}
-          — {PHASE_LABELS[cycle.phase] ?? cycle.phase}
-          {cycle.published_at
-            ? ` — published ${new Date(cycle.published_at).toLocaleDateString()}`
-            : ""}
+            <span>Cycle #{cycle.sequence_no}</span>
+            <span className="badge">
+              {PHASE_LABELS[cycle.phase] ?? cycle.phase}
+            </span>
+            {cycle.published_at ? (
+              <span className="muted">
+                {new Date(cycle.published_at).toLocaleDateString()}
+              </span>
+            ) : null}
+          </Link>
         </li>
       ))}
     </ul>

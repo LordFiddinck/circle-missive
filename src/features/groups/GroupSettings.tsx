@@ -19,18 +19,21 @@ export function GroupSettings({ group }: GroupSettingsProps) {
 
   if (!editing) {
     return (
-      <p>
-        {group.name}{" "}
-        <button
-          type="button"
-          onClick={() => {
-            setName(group.name);
-            setEditing(true);
-          }}
-        >
-          Rename
-        </button>
-      </p>
+      <>
+        <h1>{group.name}</h1>
+        <p>
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => {
+              setName(group.name);
+              setEditing(true);
+            }}
+          >
+            Rename group
+          </button>
+        </p>
+      </>
     );
   }
 

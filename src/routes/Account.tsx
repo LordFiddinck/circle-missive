@@ -22,7 +22,7 @@ export default function Account() {
 
   return (
     <main>
-      <p>
+      <p className="back-link">
         <Link to="/">&larr; Back to your groups</Link>
       </p>
       <h1>Account</h1>

@@ -9,6 +9,11 @@ export type ProposalWithAuthor = QuestionProposal & {
   author: Pick<Profile, "user_id" | "display_name"> | null;
 };
 
+/** A finalized question, with its (optional) public attribution resolved. */
+export type CycleQuestionWithAsker = CycleQuestion & {
+  asker: Pick<Profile, "user_id" | "display_name"> | null;
+};
+
 /** Every proposal for a cycle, from every member — lets the group avoid duplicates. */
 export async function fetchProposals(
   cycleId: string,
@@ -26,10 +31,16 @@ export async function createProposal(
   cycleId: string,
   authorId: string,
   text: string,
+  showAuthor: boolean,
 ): Promise<QuestionProposal> {
   const { data, error } = await supabase
     .from("question_proposals")
-    .insert({ cycle_id: cycleId, author_id: authorId, text })
+    .insert({
+      cycle_id: cycleId,
+      author_id: authorId,
+      text,
+      show_author: showAuthor,
+    })
     .select()
     .single();
   if (error) throw error;
@@ -38,11 +49,11 @@ export async function createProposal(
 
 export async function updateProposal(
   proposalId: string,
-  text: string,
+  changes: Partial<Pick<QuestionProposal, "text" | "show_author">>,
 ): Promise<QuestionProposal> {
   const { data, error } = await supabase
     .from("question_proposals")
-    .update({ text })
+    .update(changes)
     .eq("id", proposalId)
     .select()
     .single();
@@ -71,14 +82,26 @@ export async function finalizeQuestions(
   return data;
 }
 
+/**
+ * Organizer-only: opens answering with every suggestion, in the order
+ * they were suggested. The one-click alternative to hand-picking.
+ */
+export async function releaseQuestions(cycleId: string) {
+  const { data, error } = await supabase.rpc("release_questions", {
+    p_cycle_id: cycleId,
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchCycleQuestions(
   cycleId: string,
-): Promise<CycleQuestion[]> {
+): Promise<CycleQuestionWithAsker[]> {
   const { data, error } = await supabase
     .from("cycle_questions")
-    .select("*")
+    .select("*, asker:profiles(user_id, display_name)")
     .eq("cycle_id", cycleId)
     .order("position", { ascending: true });
   if (error) throw error;
-  return data;
+  return data as unknown as CycleQuestionWithAsker[];
 }

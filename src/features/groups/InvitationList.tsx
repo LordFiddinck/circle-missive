@@ -47,7 +47,7 @@ export function InvitationList({ groupId }: InvitationListProps) {
   }
 
   return (
-    <ul aria-label="Invitations">
+    <ul aria-label="Invitations" className="rows">
       {invitations.data.map((invitation) => {
         const expired = isEffectivelyExpired(
           invitation.status,
@@ -59,8 +59,11 @@ export function InvitationList({ groupId }: InvitationListProps) {
             : invitation.status;
         return (
           <li key={invitation.id}>
-            <span>
-              {invitation.email_normalized} — {displayStatus}
+            <span className="row-main">{invitation.email_normalized}</span>
+            <span
+              className={displayStatus === "pending" ? "badge" : "badge quiet"}
+            >
+              {displayStatus}
             </span>
             {invitation.status === "pending" || expired ? (
               <>
@@ -73,6 +76,7 @@ export function InvitationList({ groupId }: InvitationListProps) {
                 </button>
                 <button
                   type="button"
+                  className="danger"
                   onClick={() => revokeInvitation.mutate(invitation.id)}
                   disabled={revokeInvitation.isPending || expired}
                 >

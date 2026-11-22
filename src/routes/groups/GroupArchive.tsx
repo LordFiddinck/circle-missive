@@ -12,7 +12,7 @@ export default function GroupArchive() {
 
   return (
     <main>
-      <p>
+      <p className="back-link">
         <Link to={`/groups/${groupId}`}>&larr; Back to group</Link>
       </p>
       <h1>{group.data ? `${group.data.name} — archive` : "Archive"}</h1>

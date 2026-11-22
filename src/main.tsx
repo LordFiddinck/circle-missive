@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
+import "@fontsource-variable/newsreader/opsz.css";
+import "@fontsource-variable/figtree/wght.css";
 import "./styles/global.css";
 
 // Hash-based routing keeps GitHub Pages deployment simple: no server-side

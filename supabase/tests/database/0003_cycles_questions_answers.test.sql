@@ -318,13 +318,17 @@ select is(
 -- submit_answers(): completeness validation, authorization, idempotency
 -- ---------------------------------------------------------------------
 
-select tests.authenticate_as(:'bob_uid');
+-- Partial submissions are allowed (see 0009), but a member with no
+-- answers at all (Alice, whose drafts are all still blank) has nothing
+-- to submit.
+select tests.authenticate_as(:'alice_uid');
 select throws_ok(
   format('select submit_answers(%L)', :'cycle_a1_id'),
   '22023',
-  'Answer every question before submitting.',
-  'submit_answers refuses to submit while a question is still blank'
+  'Answer at least one question before submitting.',
+  'submit_answers refuses to submit when every question is still blank'
 );
+select tests.authenticate_as(:'bob_uid');
 
 update answers set body = 'Finished a big project at work.'
   where question_id = :'q2_id' and author_id = :'bob_uid';
@@ -340,7 +344,7 @@ select throws_ok(
 select tests.authenticate_as(:'bob_uid');
 select lives_ok(
   format('select submit_answers(%L)', :'cycle_a1_id'),
-  'a member can submit once every question has a draft'
+  'a member can submit once they have answered every question'
 );
 select is(
   (select count(*)::int from answers where author_id = :'bob_uid' and submitted_at is not null),

@@ -38,7 +38,7 @@ export default function SignIn() {
   }
 
   return (
-    <main>
+    <main className="narrow">
       <h1>Sign in to Circle Missive</h1>
       <p>
         Enter the email address you were invited with. We&rsquo;ll send you a

@@ -88,7 +88,7 @@ export function IssueReader({ cycleId, currentUserId }: IssueReaderProps) {
   const allEntries = entries.data ?? [];
 
   return (
-    <div>
+    <div className="issue">
       {allQuestions.map((question) => {
         const questionEntries = allEntries.filter(
           (entry) => entry.question_id === question.id,
@@ -99,6 +99,11 @@ export function IssueReader({ cycleId, currentUserId }: IssueReaderProps) {
         return (
           <section key={question.id} aria-labelledby={`issue-q-${question.id}`}>
             <h3 id={`issue-q-${question.id}`}>{question.text}</h3>
+            {question.asker?.display_name ? (
+              <p className="question-asker">
+                Asked by {question.asker.display_name}
+              </p>
+            ) : null}
             {questionEntries.length === 0 ? (
               <p>No one answered this one.</p>
             ) : (

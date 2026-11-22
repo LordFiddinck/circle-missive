@@ -5,6 +5,7 @@ import {
   fetchCycleQuestions,
   fetchProposals,
   finalizeQuestions,
+  releaseQuestions,
   updateProposal,
 } from "./api";
 
@@ -27,7 +28,8 @@ export function useCycleQuestions(cycleId: string | undefined) {
 export function useCreateProposal(cycleId: string, authorId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (text: string) => createProposal(cycleId, authorId, text),
+    mutationFn: ({ text, showAuthor }: { text: string; showAuthor: boolean }) =>
+      createProposal(cycleId, authorId, text, showAuthor),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["proposals", cycleId] });
     },
@@ -37,8 +39,14 @@ export function useCreateProposal(cycleId: string, authorId: string) {
 export function useUpdateProposal(cycleId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, text }: { id: string; text: string }) =>
-      updateProposal(id, text),
+    mutationFn: ({
+      id,
+      ...changes
+    }: {
+      id: string;
+      text?: string;
+      show_author?: boolean;
+    }) => updateProposal(id, changes),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["proposals", cycleId] });
     },
@@ -60,6 +68,24 @@ export function useFinalizeQuestions(groupId: string, cycleId: string) {
   return useMutation({
     mutationFn: (orderedProposalIds: string[]) =>
       finalizeQuestions(cycleId, orderedProposalIds),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["proposals", cycleId] });
+      void queryClient.invalidateQueries({
+        queryKey: ["cycle-questions", cycleId],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["cycle", cycleId] });
+      void queryClient.invalidateQueries({ queryKey: ["cycles", groupId] });
+      void queryClient.invalidateQueries({
+        queryKey: ["cycles", "current", groupId],
+      });
+    },
+  });
+}
+
+export function useReleaseQuestions(groupId: string, cycleId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => releaseQuestions(cycleId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["proposals", cycleId] });
       void queryClient.invalidateQueries({

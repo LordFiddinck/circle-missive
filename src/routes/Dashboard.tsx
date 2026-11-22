@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient";
 import { useSession } from "@/lib/useSession";
 import { useGroups } from "@/features/groups/queries";
 import { useMyPendingInvitations } from "@/features/invitations/queries";
@@ -31,7 +30,7 @@ export default function Dashboard() {
       {groups.isError ? <p role="alert">Could not load your groups.</p> : null}
 
       {groups.data && groups.data.length > 0 ? (
-        <ul aria-label="Your groups">
+        <ul aria-label="Your groups" className="rows links">
           {groups.data.map((group) => (
             <li key={group.id}>
               <Link to={`/groups/${group.id}`}>{group.name}</Link>
@@ -45,14 +44,6 @@ export default function Dashboard() {
       <p>
         <Link to="/groups/new">Start a new group</Link>
       </p>
-
-      <p>
-        <Link to="/account">Account and email preferences</Link>
-      </p>
-
-      <button type="button" onClick={() => supabase.auth.signOut()}>
-        Sign out
-      </button>
     </main>
   );
 }

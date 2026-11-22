@@ -1,5 +1,14 @@
 import { useEffect, useRef } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { supabase } from "./lib/supabaseClient";
+import { useSession } from "./lib/useSession";
 import SignIn from "./routes/SignIn";
 import Dashboard from "./routes/Dashboard";
 import Account from "./routes/Account";
@@ -19,6 +28,7 @@ export default function App() {
   const location = useLocation();
   const mainRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const { session } = useSession();
 
   // WCAG 2.4.1 (Bypass Blocks) / 4.1.3 (Status Messages): a hash-routed
   // single-page app never does a real navigation, so the browser never
@@ -59,6 +69,42 @@ export default function App() {
       </a>
       {/* tabIndex=-1: not in tab order, but focusable programmatically so
           the effect above can send focus here on route change. */}
+      <header className="site-header">
+        <div className="site-header__inner">
+          <Link to="/" className="brand">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="5.5" width="18" height="13" rx="3" />
+              <path d="m4 8 8 6 8-6" />
+            </svg>
+            Circle Missive
+          </Link>
+          {session ? (
+            <nav className="site-nav" aria-label="Main">
+              <NavLink to="/" end>
+                Your groups
+              </NavLink>
+              <NavLink to="/account">Account</NavLink>
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => supabase.auth.signOut()}
+              >
+                Sign out
+              </button>
+            </nav>
+          ) : null}
+        </div>
+      </header>
       <div id="main-content" ref={mainRef} tabIndex={-1}>
         <Routes>
           <Route path="/sign-in" element={<SignIn />} />

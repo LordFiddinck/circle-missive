@@ -35,7 +35,7 @@ export function PendingInvitations({ invitations }: PendingInvitationsProps) {
   }
 
   return (
-    <section aria-label="Pending invites">
+    <section aria-label="Pending invites" className="invites">
       <h2>Pending invites</h2>
       <ul>
         {invitations.map((invitation) => {
@@ -54,6 +54,7 @@ export function PendingInvitations({ invitations }: PendingInvitationsProps) {
               </p>
               <button
                 type="button"
+                className="primary"
                 onClick={() => handleAccept(invitation.invitationId)}
                 disabled={acceptInvitation.isPending}
               >

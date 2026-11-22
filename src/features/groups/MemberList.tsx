@@ -24,14 +24,20 @@ export function MemberList({
   }
 
   return (
-    <ul aria-label="Members">
+    <ul aria-label="Members" className="rows">
       {members.data?.map((member) => {
         const label = member.profile?.display_name || "(no name set)";
         const isSelf = member.user_id === currentUserId;
         return (
           <li key={member.id}>
-            <span>
-              {label} {isSelf ? "(you)" : ""} — {member.role}
+            <span className="row-main">
+              {label}
+              {isSelf ? <span className="muted"> (you)</span> : null}
+            </span>
+            <span
+              className={member.role === "organizer" ? "badge" : "badge quiet"}
+            >
+              {member.role}
             </span>
             {isOrganizer && !isSelf ? (
               <>
@@ -52,6 +58,7 @@ export function MemberList({
                 </button>
                 <button
                   type="button"
+                  className="danger"
                   onClick={() => {
                     if (window.confirm(`Remove ${label} from the group?`)) {
                       removeMember.mutate(member.user_id);

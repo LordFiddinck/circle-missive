@@ -61,13 +61,17 @@ export default function CycleDetail() {
 
   return (
     <main>
-      <p>
+      <p className="back-link">
         <Link to={`/groups/${groupId}`}>&larr; Back to group</Link>
       </p>
       <h1>Cycle #{cycle.data.sequence_no}</h1>
-      <p>
-        {PHASE_LABELS[cycle.data.phase] ?? cycle.data.phase}
-        {deadline ? ` — due ${new Date(deadline).toLocaleString()}` : ""}
+      <p className="cycle-meta">
+        <span className="badge">
+          {PHASE_LABELS[cycle.data.phase] ?? cycle.data.phase}
+        </span>
+        {deadline ? (
+          <span>Due {new Date(deadline).toLocaleString()}</span>
+        ) : null}
       </p>
 
       {cycle.data.phase === "question_collection" ? (

@@ -82,11 +82,27 @@ export type Cycle = {
   updated_at: string;
 };
 
+/**
+ * A pair of members who cannot read each other's answers. Organizer-only
+ * to read; changed through hide_answers_between / restore_answers_between.
+ */
+export type AnswerVisibilityBlock = {
+  id: string;
+  group_id: string;
+  /** Always the smaller id of the pair (user_a < user_b). */
+  user_a: string;
+  user_b: string;
+  created_by: string | null;
+  created_at: string;
+};
+
 export type QuestionProposal = {
   id: string;
   cycle_id: string;
   author_id: string;
   text: string;
+  /** The author chooses whether their name appears on the question. */
+  show_author: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -97,6 +113,8 @@ export type CycleQuestion = {
   proposal_id: string | null;
   text: string;
   position: number;
+  /** The proposer's id if they chose to be shown, otherwise null (anonymous). */
+  asked_by: string | null;
   created_at: string;
 };
 
@@ -181,12 +199,14 @@ export type Database = {
       cycles: TableDef<Cycle, never>;
       question_proposals: TableDef<
         QuestionProposal,
-        Partial<Pick<QuestionProposal, "text">>,
-        Pick<QuestionProposal, "cycle_id" | "author_id" | "text">
+        Partial<Pick<QuestionProposal, "text" | "show_author">>,
+        Pick<QuestionProposal, "cycle_id" | "author_id" | "text"> &
+          Partial<Pick<QuestionProposal, "show_author">>
       >;
       cycle_questions: TableDef<CycleQuestion, never>;
       answers: TableDef<Answer, Partial<Pick<Answer, "body">>>;
       issue_entries: TableDef<IssueEntry, never>;
+      answer_visibility_blocks: TableDef<AnswerVisibilityBlock, never>;
       email_preferences: TableDef<
         EmailPreferences,
         Partial<
@@ -265,6 +285,18 @@ export type Database = {
       finalize_questions: {
         Args: { p_cycle_id: string; p_proposal_ids: string[] };
         Returns: Cycle;
+      };
+      release_questions: {
+        Args: { p_cycle_id: string };
+        Returns: Cycle;
+      };
+      hide_answers_between: {
+        Args: { p_group_id: string; p_user_one: string; p_user_two: string };
+        Returns: undefined;
+      };
+      restore_answers_between: {
+        Args: { p_group_id: string; p_user_one: string; p_user_two: string };
+        Returns: undefined;
       };
       submit_answers: {
         Args: { p_cycle_id: string };
