@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Profile } from "@/lib/database.types";
 import { useUpdateMyProfile } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type DisplayNameFieldProps = {
   profile: Profile;
@@ -62,9 +63,7 @@ export function DisplayNameField({ profile }: DisplayNameFieldProps) {
       ) : null}
       {updateProfile.isError ? (
         <p role="alert">
-          {updateProfile.error instanceof Error
-            ? updateProfile.error.message
-            : "Could not save your name."}
+          {errorMessage(updateProfile.error, "Could not save your name.")}
         </p>
       ) : null}
     </form>

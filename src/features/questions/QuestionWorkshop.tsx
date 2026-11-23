@@ -7,6 +7,7 @@ import {
   useReleaseQuestions,
   useUpdateProposal,
 } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type QuestionWorkshopProps = {
   groupId: string;
@@ -319,9 +320,10 @@ export function QuestionWorkshop({
           </button>
           {finalizeQuestions.isError ? (
             <p role="alert">
-              {finalizeQuestions.error instanceof Error
-                ? finalizeQuestions.error.message
-                : "Could not finalize these questions."}
+              {errorMessage(
+                finalizeQuestions.error,
+                "Could not finalize these questions.",
+              )}
             </p>
           ) : null}
 
@@ -341,9 +343,10 @@ export function QuestionWorkshop({
           </button>
           {releaseQuestions.isError ? (
             <p role="alert">
-              {releaseQuestions.error instanceof Error
-                ? releaseQuestions.error.message
-                : "Could not release the questions."}
+              {errorMessage(
+                releaseQuestions.error,
+                "Could not release the questions.",
+              )}
             </p>
           ) : null}
         </section>

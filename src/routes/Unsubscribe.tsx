@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useUnsubscribeByToken } from "@/features/notifications/queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type EmailCategory = "reminders" | "announcements";
 
@@ -58,9 +59,10 @@ export default function Unsubscribe() {
 
       {unsubscribe.isError ? (
         <p role="alert">
-          {unsubscribe.error instanceof Error
-            ? unsubscribe.error.message
-            : "This unsubscribe link is no longer valid."}
+          {errorMessage(
+            unsubscribe.error,
+            "This unsubscribe link is no longer valid.",
+          )}
         </p>
       ) : null}
 

@@ -106,6 +106,26 @@ Never add the Supabase **service-role** key, Resend key, or Groq key as a
 frontend/Pages secret — those belong only in Supabase project secrets,
 consumed by Edge Functions server-side.
 
+### Photos (Supabase Storage)
+
+Migration `0011_issue_photos.sql` creates the private `issue-photos`
+bucket (2 MB per file, JPEG only) and its access policies on
+`storage.objects`; there is nothing to configure by hand. After the first
+`supabase db push`, confirm in **Storage → Policies** that the bucket has
+exactly three policies (`issue_photos_objects_select`, `_insert`,
+`_delete`) and no others that would widen access — particularly no policy
+that makes the bucket public. The page's Content-Security-Policy
+(`index.html`) allows images from `https://*.supabase.co` and `blob:`
+(the local preview); it needs no other change. Storage limits (total size,
+bandwidth) are set by your Supabase plan.
+
+If `supabase db push` stops at the `storage.objects` policies with a
+"must be owner of table objects" error, run the bucket `insert` and the
+three `create policy` statements from the bottom of
+`0011_issue_photos.sql` in the Supabase SQL Editor instead, then record the
+migration as applied with `supabase migration repair --status applied
+0011`.
+
 ### Deploying the scheduling/email backend
 
 `deploy-pages.yml` only builds and publishes the frontend. The Edge
@@ -151,10 +171,27 @@ Functions and cron jobs are deployed separately (not yet wired into CI):
   text, and a group's full cycle history is browsable in its archive.
 - Scheduling: `next_action_at` + `scheduler_tick()` auto-publish a cycle
   and start the next one at the deadline, send deadline reminders to
-  members who haven't submitted, and nudge organizers about an overdue,
-  unfinalized question phase (automatic question _selection_ is
-  deliberately out of scope — see `0004_scheduling_email.sql`'s header
-  comment)
+  members who haven't submitted, and, once the question phase ends,
+  release every suggestion in the order it was suggested (up to 50) —
+  or, if nobody suggested anything, nudge organizers. Organizers can also
+  hand-pick an ordered set, or release everything in one click, before
+  then (see `0009_attribution_release_partial_submit.sql`)
+- Answering is flexible: members can submit with some questions blank
+  (those are left out of the issue and can be added later), and at the
+  deadline — or an early publish — any saved drafts are submitted
+  automatically. Whoever suggests a question chooses whether their name
+  is shown on it
+- Organizers can hide two members' answers and photos from each other
+  (`0010_answer_visibility_blocks.sql`). The rule is enforced in the
+  database's row-level security, retroactively and symmetrically; the two
+  people are not told
+- Photos: up to 5 per member per issue, each with a caption, added while a
+  cycle is open for answers and shared with the group on publication
+  (`0011_issue_photos.sql`). Photos are shrunk and re-encoded in the
+  browser (which strips location metadata) and stored in a private
+  Supabase Storage bucket, `issue-photos`, whose access rules defer to the
+  `issue_photos` table so a file and its row can never disagree about who
+  may see them. See "Photos" under Deployment for the one-time checks
 - Email: a durable outbox with dedupe, capped-backoff retries, and
   permanent-failure marking; Resend integration via `email-worker`;
   per-user reminders/announcements preferences with one-click

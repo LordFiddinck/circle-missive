@@ -51,3 +51,53 @@ begin
   end if;
 end;
 $$;
+
+-- Same idea for Supabase Storage (needed from 0011_issue_photos.sql
+-- on): a minimal `storage` schema — buckets, objects with row-level
+-- security enabled, and the `foldername()` helper that Storage policies
+-- use — so migrations that create a bucket and policies on
+-- `storage.objects` apply on plain Postgres. Silent no-op against a real
+-- Supabase stack, which already has all of this.
+do $$
+begin
+  if not exists (select 1 from pg_namespace where nspname = 'storage') then
+    create schema storage;
+
+    create table storage.buckets (
+      id text primary key,
+      name text not null,
+      public boolean not null default false,
+      file_size_limit bigint,
+      allowed_mime_types text[],
+      created_at timestamptz not null default now()
+    );
+
+    create table storage.objects (
+      id uuid primary key default gen_random_uuid(),
+      bucket_id text references storage.buckets (id),
+      name text,
+      owner uuid,
+      created_at timestamptz not null default now(),
+      unique (bucket_id, name)
+    );
+
+    alter table storage.objects enable row level security;
+
+    -- Same logic as Supabase's own storage.foldername(): every path
+    -- segment except the file name.
+    create function storage.foldername(name text) returns text[]
+    language plpgsql
+    as $fn$
+    declare
+      _parts text[];
+    begin
+      select string_to_array(name, '/') into _parts;
+      return _parts[1:array_length(_parts, 1) - 1];
+    end
+    $fn$;
+
+    grant usage on schema storage to anon, authenticated;
+    grant select, insert, update, delete on storage.objects to authenticated;
+  end if;
+end;
+$$;

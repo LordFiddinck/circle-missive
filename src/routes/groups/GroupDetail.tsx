@@ -8,6 +8,7 @@ import { useGroup, useLeaveGroup, useMembers } from "@/features/groups/queries";
 import { useCurrentCycle, useStartCycle } from "@/features/cycles/queries";
 import { EmailActivity } from "@/features/notifications/EmailActivity";
 import { AnswerVisibility } from "@/features/visibility/AnswerVisibility";
+import { errorMessage } from "@/lib/errorMessage";
 
 const PHASE_LABELS: Record<string, string> = {
   question_collection: "Collecting questions",
@@ -105,9 +106,7 @@ export default function GroupDetail() {
             ) : null}
             {startCycle.isError ? (
               <p role="alert">
-                {startCycle.error instanceof Error
-                  ? startCycle.error.message
-                  : "Could not start a new cycle."}
+                {errorMessage(startCycle.error, "Could not start a new cycle.")}
               </p>
             ) : null}
           </>
@@ -159,9 +158,7 @@ export default function GroupDetail() {
         </button>
         {leaveGroup.isError ? (
           <p role="alert">
-            {leaveGroup.error instanceof Error
-              ? leaveGroup.error.message
-              : "Could not leave the group."}
+            {errorMessage(leaveGroup.error, "Could not leave the group.")}
           </p>
         ) : null}
       </section>

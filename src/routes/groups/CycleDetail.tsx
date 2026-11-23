@@ -5,6 +5,7 @@ import { useCycle } from "@/features/cycles/queries";
 import { OrganizerProgress } from "@/features/cycles/OrganizerProgress";
 import { QuestionWorkshop } from "@/features/questions/QuestionWorkshop";
 import { AnswerEditor } from "@/features/answers/AnswerEditor";
+import { PhotoUploader } from "@/features/photos/PhotoUploader";
 import { IssueReader } from "@/features/issues/IssueReader";
 
 const PHASE_LABELS: Record<string, string> = {
@@ -84,7 +85,10 @@ export default function CycleDetail() {
       ) : null}
 
       {cycle.data.phase === "answering" ? (
-        <AnswerEditor groupId={groupId} cycleId={cycleId} />
+        <>
+          <AnswerEditor groupId={groupId} cycleId={cycleId} />
+          <PhotoUploader cycleId={cycleId} currentUserId={currentUserId} />
+        </>
       ) : null}
 
       {cycle.data.phase === "published" ? (

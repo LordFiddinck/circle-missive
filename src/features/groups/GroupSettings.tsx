@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Group } from "@/lib/database.types";
 import { useUpdateGroup } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type GroupSettingsProps = {
   group: Group;
@@ -60,11 +61,7 @@ export function GroupSettings({ group }: GroupSettingsProps) {
         Cancel
       </button>
       {updateGroup.isError ? (
-        <p role="alert">
-          {updateGroup.error instanceof Error
-            ? updateGroup.error.message
-            : "Could not save."}
-        </p>
+        <p role="alert">{errorMessage(updateGroup.error, "Could not save.")}</p>
       ) : null}
     </form>
   );

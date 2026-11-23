@@ -7,6 +7,7 @@ import {
   useReopenSubmission,
   useSkipCycle,
 } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type OrganizerProgressProps = {
   groupId: string;
@@ -134,9 +135,10 @@ export function OrganizerProgress({
           </button>
           {changeDeadline.isError ? (
             <p role="alert">
-              {changeDeadline.error instanceof Error
-                ? changeDeadline.error.message
-                : "Could not update the deadline."}
+              {errorMessage(
+                changeDeadline.error,
+                "Could not update the deadline.",
+              )}
             </p>
           ) : null}
         </form>
@@ -164,16 +166,12 @@ export function OrganizerProgress({
       </div>
       {publishCycle.isError ? (
         <p role="alert">
-          {publishCycle.error instanceof Error
-            ? publishCycle.error.message
-            : "Could not publish this cycle."}
+          {errorMessage(publishCycle.error, "Could not publish this cycle.")}
         </p>
       ) : null}
       {skipCycle.isError ? (
         <p role="alert">
-          {skipCycle.error instanceof Error
-            ? skipCycle.error.message
-            : "Could not skip this cycle."}
+          {errorMessage(skipCycle.error, "Could not skip this cycle.")}
         </p>
       ) : null}
     </section>

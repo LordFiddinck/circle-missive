@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateGroup } from "@/features/groups/queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 const DEFAULT_TIMEZONE =
   Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
@@ -51,9 +52,7 @@ export default function NewGroup() {
       {createGroup.isError ? (
         <p role="alert">
           Could not create the group:{" "}
-          {createGroup.error instanceof Error
-            ? createGroup.error.message
-            : "Unknown error"}
+          {errorMessage(createGroup.error, "Unknown error")}
         </p>
       ) : null}
     </main>

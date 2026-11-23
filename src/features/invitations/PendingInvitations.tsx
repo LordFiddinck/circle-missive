@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { PendingInvitation } from "./api";
 import { useAcceptInvitationById } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 function formatExpiry(value: string): string {
   const parsed = new Date(value);
@@ -62,9 +63,10 @@ export function PendingInvitations({ invitations }: PendingInvitationsProps) {
               </button>
               {isThisOneErrored ? (
                 <p role="alert">
-                  {acceptInvitation.error instanceof Error
-                    ? acceptInvitation.error.message
-                    : "Could not accept this invite."}
+                  {errorMessage(
+                    acceptInvitation.error,
+                    "Could not accept this invite.",
+                  )}
                 </p>
               ) : null}
             </li>

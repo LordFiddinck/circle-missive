@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnswerWithQuestion } from "./api";
 import { useMyAnswers, useSaveAnswerDraft, useSubmitAnswers } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 const AUTOSAVE_DELAY_MS = 800;
 
@@ -315,9 +316,10 @@ export function AnswerEditor({ groupId, cycleId }: AnswerEditorProps) {
           ) : null}
           {submitAnswers.isError ? (
             <p role="alert">
-              {submitAnswers.error instanceof Error
-                ? submitAnswers.error.message
-                : "Could not submit your answers."}
+              {errorMessage(
+                submitAnswers.error,
+                "Could not submit your answers.",
+              )}
             </p>
           ) : null}
         </>

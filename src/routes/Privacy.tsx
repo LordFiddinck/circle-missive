@@ -36,6 +36,13 @@ export default function Privacy() {
           cycle is published.
         </li>
         <li>
+          <strong>Photos:</strong> photos you add to an issue, with their
+          captions. Each photo is shrunk and re-saved in your browser before it
+          is uploaded, which removes hidden metadata such as the location a
+          phone embeds in photos. Like answers, they are visible only to you
+          until the issue is published.
+        </li>
+        <li>
           <strong>Email delivery records:</strong> which notifications were sent
           to you, their delivery status (delivered, bounced, complained), and
           your reminder/announcement preferences.
@@ -50,9 +57,10 @@ export default function Privacy() {
       <h2>Who can see it</h2>
       <p>
         Group organizers can see membership and completion status, but not your
-        draft text. Other members can see your answers only after a cycle you
-        submitted to is published. Database rules (Row Level Security) enforce
-        this on every request, not just in the app&rsquo;s interface.
+        draft text. Other members can see your answers and photos only after a
+        cycle you contributed to is published. Database rules (Row Level
+        Security) enforce this on every request, not just in the app&rsquo;s
+        interface.
       </p>
 
       <h2>Who processes it</h2>
@@ -60,7 +68,7 @@ export default function Privacy() {
         <a href="https://supabase.com/privacy" target="_blank" rel="noreferrer">
           Supabase
         </a>{" "}
-        hosts our authentication, database, and server functions.{" "}
+        hosts our authentication, database, photo storage, and server functions.{" "}
         <a
           href="https://resend.com/legal/privacy-policy"
           target="_blank"
@@ -74,11 +82,13 @@ export default function Privacy() {
 
       <h2>How long we keep it</h2>
       <p>
-        Answers and issues are kept for as long as your group exists, so the
-        archive stays complete. Expired/unused invitations, delivery records,
-        and superseded drafts are not currently deleted automatically — an
-        operator should set and document a retention schedule for these before a
-        real pilot (see the operations runbook).
+        Answers, photos, and issues are kept for as long as your group exists,
+        so the archive stays complete. You can remove your own photos until an
+        issue is published; after that, an organizer can remove them.
+        Expired/unused invitations, delivery records, and superseded drafts are
+        not currently deleted automatically — an operator should set and
+        document a retention schedule for these before a real pilot (see the
+        operations runbook).
       </p>
 
       <h2>Your choices</h2>
@@ -89,7 +99,11 @@ export default function Privacy() {
           and deadline notices are sent regardless — they&rsquo;re how the site
           brings you back at the right moment.
         </li>
-        <li>You can leave a group at any time by contacting its organizer.</li>
+        <li>
+          You can leave a group at any time from the group&rsquo;s page (if
+          you&rsquo;re its only organizer, make someone else an organizer
+          first).
+        </li>
         <li>
           Self-serve data export and account deletion are planned but not built
           yet (see the project README&rsquo;s &ldquo;Not yet implemented&rdquo;

@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { useCycleQuestions } from "@/features/questions/queries";
 import { useSubmitLateAnswer } from "@/features/answers/queries";
+import { IssuePhotos } from "@/features/photos/IssuePhotos";
 import { useIssueEntries } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type IssueReaderProps = {
   cycleId: string;
@@ -63,9 +65,7 @@ function LateAnswerForm({
       </button>
       {submitLateAnswer.isError ? (
         <p role="alert">
-          {submitLateAnswer.error instanceof Error
-            ? submitLateAnswer.error.message
-            : "Could not add your answer."}
+          {errorMessage(submitLateAnswer.error, "Could not add your answer.")}
         </p>
       ) : null}
     </form>
@@ -129,6 +129,7 @@ export function IssueReader({ cycleId, currentUserId }: IssueReaderProps) {
           </section>
         );
       })}
+      <IssuePhotos cycleId={cycleId} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useMembers, useRemoveMember, useSetMemberRole } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type MemberListProps = {
   groupId: string;
@@ -75,11 +76,10 @@ export function MemberList({
       })}
       {(removeMember.isError || setMemberRole.isError) && (
         <p role="alert">
-          {removeMember.error instanceof Error
-            ? removeMember.error.message
-            : setMemberRole.error instanceof Error
-              ? setMemberRole.error.message
-              : "That change couldn't be made."}
+          {errorMessage(
+            removeMember.error ?? setMemberRole.error,
+            "That change couldn't be made.",
+          )}
         </p>
       )}
     </ul>

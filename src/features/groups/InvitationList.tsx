@@ -4,6 +4,7 @@ import {
   useResendInvitation,
   useRevokeInvitation,
 } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type InvitationListProps = {
   groupId: string;
@@ -94,11 +95,10 @@ export function InvitationList({ groupId }: InvitationListProps) {
       })}
       {(resendInvitation.isError || revokeInvitation.isError) && (
         <p role="alert">
-          {resendInvitation.error instanceof Error
-            ? resendInvitation.error.message
-            : revokeInvitation.error instanceof Error
-              ? revokeInvitation.error.message
-              : "That change couldn't be made."}
+          {errorMessage(
+            resendInvitation.error ?? revokeInvitation.error,
+            "That change couldn't be made.",
+          )}
         </p>
       )}
     </ul>

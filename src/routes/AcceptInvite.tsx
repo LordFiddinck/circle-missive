@@ -6,6 +6,7 @@ import {
   useAcceptInvitation,
   useInvitationPreview,
 } from "@/features/groups/queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 function isEffectivelyExpired(status: string, expiresAt: string): boolean {
   return (
@@ -152,9 +153,7 @@ export default function AcceptInvite() {
           {acceptInvitation.isError ? (
             <p role="alert">
               Could not accept the invite:{" "}
-              {acceptInvitation.error instanceof Error
-                ? acceptInvitation.error.message
-                : "Unknown error"}
+              {errorMessage(acceptInvitation.error, "Unknown error")}
             </p>
           ) : null}
         </>

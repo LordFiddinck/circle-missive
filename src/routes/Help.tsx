@@ -21,9 +21,9 @@ export default function Help() {
           released for you automatically.
         </li>
         <li>
-          Each member answers as many of the questions as they like. Drafts
-          autosave as you type and are visible only to you until the issue is
-          published.
+          Each member answers as many of the questions as they like, and can add
+          a few photos. Drafts autosave as you type and are visible only to you
+          until the issue is published.
         </li>
         <li>
           Near the deadline, anyone who hasn&rsquo;t submitted yet gets a
@@ -57,6 +57,18 @@ export default function Help() {
         an issue is published, answers can&rsquo;t be edited, but you can still
         add an answer to any question you skipped. It&rsquo;s labeled
         &ldquo;added later.&rdquo;
+      </p>
+
+      <h2>Can I add photos to an issue?</h2>
+      <p>
+        Yes. While a cycle is open for answers, the Photos section below the
+        questions lets you add up to 5 photos, each with a short description.
+        Your photos are shrunk on your device before they&rsquo;re uploaded,
+        which also removes any location data hidden in the file, and only you
+        can see them until the issue is published. Until then you can edit a
+        description or remove a photo. Once the issue is published, photos
+        can&rsquo;t be added or changed, and an organizer can remove one if
+        needed.
       </p>
 
       <h2>Who sees my name on a question I suggest?</h2>

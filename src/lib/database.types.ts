@@ -96,6 +96,23 @@ export type AnswerVisibilityBlock = {
   created_at: string;
 };
 
+/**
+ * A photo attached to an issue. The file lives in the private
+ * `issue-photos` Storage bucket at `storage_path`.
+ */
+export type IssuePhoto = {
+  id: string;
+  cycle_id: string;
+  author_id: string;
+  /** Always `<cycle_id>/<author_id>/<id>.jpg`. */
+  storage_path: string;
+  caption: string;
+  width: number;
+  height: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type QuestionProposal = {
   id: string;
   cycle_id: string;
@@ -207,6 +224,15 @@ export type Database = {
       answers: TableDef<Answer, Partial<Pick<Answer, "body">>>;
       issue_entries: TableDef<IssueEntry, never>;
       answer_visibility_blocks: TableDef<AnswerVisibilityBlock, never>;
+      issue_photos: TableDef<
+        IssuePhoto,
+        Partial<Pick<IssuePhoto, "caption">>,
+        Pick<
+          IssuePhoto,
+          "id" | "cycle_id" | "author_id" | "storage_path" | "width" | "height"
+        > &
+          Partial<Pick<IssuePhoto, "caption">>
+      >;
       email_preferences: TableDef<
         EmailPreferences,
         Partial<

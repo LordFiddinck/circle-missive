@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useMembers } from "@/features/groups/queries";
 import { useAnswerBlocks, useHideAnswers, useRestoreAnswers } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type AnswerVisibilityProps = {
   groupId: string;
@@ -114,9 +115,7 @@ export function AnswerVisibility({ groupId }: AnswerVisibilityProps) {
         ) : null}
         {hideAnswers.isError ? (
           <p role="alert">
-            {hideAnswers.error instanceof Error
-              ? hideAnswers.error.message
-              : "Could not save this change."}
+            {errorMessage(hideAnswers.error, "Could not save this change.")}
           </p>
         ) : null}
       </form>
@@ -155,9 +154,7 @@ export function AnswerVisibility({ groupId }: AnswerVisibilityProps) {
       )}
       {restoreAnswers.isError ? (
         <p role="alert">
-          {restoreAnswers.error instanceof Error
-            ? restoreAnswers.error.message
-            : "Could not save this change."}
+          {errorMessage(restoreAnswers.error, "Could not save this change.")}
         </p>
       ) : null}
     </div>

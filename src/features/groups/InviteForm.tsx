@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useCreateInvitation } from "./queries";
+import { errorMessage } from "@/lib/errorMessage";
 
 type InviteFormProps = {
   groupId: string;
@@ -53,9 +54,7 @@ export function InviteForm({ groupId }: InviteFormProps) {
 
       {createInvitation.isError ? (
         <p role="alert">
-          {createInvitation.error instanceof Error
-            ? createInvitation.error.message
-            : "Could not create the invite."}
+          {errorMessage(createInvitation.error, "Could not create the invite.")}
         </p>
       ) : null}
 
